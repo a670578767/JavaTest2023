@@ -10,7 +10,7 @@ select employee_id, last_name, salary
 from employees
 where salary between 5000 AND 8000;
 
-# 练习 ：查询部门为10,20,30部门的员工信息
+# 练习 : 查询部门为10,20,30部门的员工信息
 select last_name, salary, first_name
 from employees
 where department_id = 10
@@ -104,8 +104,30 @@ SELECT employee_id, last_name
 FROM employees
 LIMIT 2 offset 31;
 # 练习:查询员工表中工资最高的员工信息
-SELECT last_name,salary
+SELECT last_name, salary
 FROM employees
 ORDER BY salary DESC
 # LIMIT 0,1;
 LIMIT 1;
+/*
+   P24 第五章练习
+*/
+# 1.查询员工的姓名和部门号和年薪，按年薪降序，按姓名升序显示
+select last_name, salary * 12 salary_salary
+FROM employees
+order by salary desc, last_name;
+# 2.选择工资不在8000到17000的员工的姓名和工资，按工资降序，显示第21到40位置的数据
+select last_name, salary
+from employees
+where salary not between 8000 and 17000
+order by salary desc
+limit 20,20;
+# 3.查询邮箱中包含e的员工信息，并先按邮箱的字节数降序，再按部门号升序。 LENGTH 长度函数
+select *
+from employees
+where email like '%e%'
+order by LENGTH(email) desc, department_id;
+
+/*
+  P25 多表查询
+*/
