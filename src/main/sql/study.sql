@@ -131,3 +131,42 @@ order by LENGTH(email) desc, department_id;
 /*
   P25 多表查询
 */
+SELECT employee_id, department_name
+from employees,
+     departments
+WHERE employees.department_id = departments.department_id;
+# 如果查询语句中出现了多个表中都存在的字段，则必须指明此字段所在的表
+# 建议从SQL优化的角度，建议多表查询时，每个字段钱都指明所在表的表
+# 可以给表起别名，在select和where中使用表的别名
+SELECT a.employee_id, b.department_name, a.department_id
+from employees a,
+     departments b
+WHERE a.department_id = b.department_id;
+# 6.练习:查询员工信息，如果有n个表实现多表的查询，则需要n-1个连接条件，至少。
+select employee_id, last_name, department_name, city
+from employees e,
+     departments d,
+     locations l
+where e.department_id = d.department_id
+  and l.location_id = d.location_id;
+
+/*
+提出问题
+角度1：等值连接 VS 非等值连接
+角度2：自连接 VS 非自连接
+角度3：内连接 VS 外连接
+*/
+
+#7.1 不等值连接
+SELECT last_name, salary, grade_level
+FROM employees e,
+     job_grades j
+# WHERE e.salary between j.lowest_sal and highest_sal;
+WHERE e.salary >= j.lowest_sal
+  AND e.salary <= highest_sal;
+#7.2 自连接 vs 非自连接
+# 查询员工id，员工姓名及其管理者的id和姓名 , 自连接，自己连接自己
+SELECT e.employee_id, e.last_name, em.employee_id, em.last_name
+FROM employees e,
+     employees em
+WHERE e.manager_id = em.employee_id;
