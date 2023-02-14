@@ -170,3 +170,25 @@ SELECT e.employee_id, e.last_name, em.employee_id, em.last_name
 FROM employees e,
      employees em
 WHERE e.manager_id = em.employee_id;
+#7.3 内连接 vs 外连接
+/*
+  内连接:合并具有同一列的两个以上的表的行，结果集中不包含一个表与另一个表不匹配的行
+  外连接:两个表在连接过程中除了返回，满足连接条件的行意外还返回左（右）表中不满足条件的行之外，
+        还查询到了左表 或 右表的中不匹配的行。
+  外连接:左外连接，又外连接
+*/
+
+# 查询所有的员工的last_name , department_name  查询‘ 所有的 ’，外连接。
+#SQL99 实现内连接
+SELECT last_name, department_name
+FROM employees e
+         inner JOIN #内连接
+    departments d ON
+    e.department_id = d.department_id;
+#SQL99 左外连接 :  107结果  right OUTER JOIN #右外连接    122结果
+SELECT last_name, department_name
+FROM employees e
+         LEFT OUTER JOIN
+     departments d
+     ON
+         e.department_id = d.department_id;
