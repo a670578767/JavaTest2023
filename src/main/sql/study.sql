@@ -236,8 +236,13 @@ FROM departments d
 WHERE e.department_id is null;
 
 # 8.查询哪些部门没有员工
-SELECT l.location_id , l.city
-FROM locations l left join departments d on l.location_id = d.location_id
-WHERE d.location_id is null ;
+SELECT l.location_id, l.city
+FROM locations l
+         left join departments d on l.location_id = d.location_id
+WHERE d.location_id is null;
 
 # 9.查询部门名为Sales 或 IT 的员工信息
+SELECT e.employee_id, e.department_id, e.department_id
+FROM employees e
+         JOIN departments d on d.department_id = e.department_id
+WHERE d.department_name in ('Sales', 'IT');
