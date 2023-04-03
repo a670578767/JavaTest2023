@@ -1,0 +1,6 @@
+#    当前项目+ static-path-pattern+静态资源名
+spring:
+  mvc:
+    static-path-pattern: /res/**
+  resources:
+    static-locations: classpath:/haha

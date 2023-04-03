@@ -246,3 +246,27 @@ SELECT e.employee_id, e.department_id, e.department_id
 FROM employees e
          JOIN departments d on d.department_id = e.department_id
 WHERE d.department_name in ('Sales', 'IT');
+
+# 第八章 常见的聚合函数
+#1，常见的几个聚合函数
+
+#3. HAVING的使用
+#4. SQL底层执行原理
+# count :
+/*
+  count : 作用 计算指定字段中在查询结果中出现的个数
+  COUNT(*) (1) (字段名)：字段为null时，不计算，容易出错
+*/
+SELECT COUNT(employee_id) ID, COUNT(salary) SA
+FROM employees;
+
+SELECT COUNT(*)
+FROM employees;
+
+# 2. GROUP BY 的使用
+# 1.Select中出现的非组的函数的字段必须声明在Group By中，反之Group By中声明的字段可以不出现在Select中。
+# 2.GROUP BY声明在From后面，where后面，Order by前面，limit前面。
+# 3.MySQL中的Group by中使用with rollup
+select department_id,AVG(salary)
+from employees
+group by department_id with rollup ;

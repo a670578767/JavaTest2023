@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>多选下拉框示例</title>
+    <meta charset="UTF-8">
+    <script type="text/javascript">
+        function selectChange(obj) {
+            var selected = [];
+            var options = obj.options;
+            for (var i = 0; i < options.length; i++) {
+                if (options[i].selected) {
+                    selected.push(options[i].value); //将选择的值存入数组
+                }
+            }
+            document.getElementById("result").innerText = "你选择了：" + selected.join(","); //将选择的值以逗号分隔显示在页面上
+        }
+    </script>
+</head>
+<body>
+<select multiple="multiple" onchange="selectChange(this);">
+    <option value="1">选项1</option>
+    <option value="2">选项2</option>
+    <option value="3">选项3</option>
+    <option value="4">选项4</option>
+    <option value="5">选项5</option>
+</select>
+<p id="result"></p>
+</body>
+</html>
