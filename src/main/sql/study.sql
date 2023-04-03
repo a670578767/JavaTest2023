@@ -267,6 +267,76 @@ FROM employees;
 # 1.Select中出现的非组的函数的字段必须声明在Group By中，反之Group By中声明的字段可以不出现在Select中。
 # 2.GROUP BY声明在From后面，where后面，Order by前面，limit前面。
 # 3.MySQL中的Group by中使用with rollup
-select department_id,AVG(salary)
+select department_id, AVG(salary)
 from employees
-group by department_id with rollup ;
+group by department_id
+with rollup;
+
+# 3.having 用来过滤数据
+#查询各个部门中最高工资比10000高的部门信息。
+SELECT department_id, MAX(salary)
+FROM employees
+GROUP BY department_id
+having MAX(salary) > 10000;
+#结论过滤条件使用了聚合函数，则必须使用having来替换where。
+#行，已经被分组，使用聚合函数，满足having字句中条件的分组将被显示，having不能单独使用，必须药跟Group BY一起使用
+
+#方式 1 : 查询部门ID为10,20,30，40这4个部门中最高工资比10000高的部门信息
+SELECT department_id, MAX(salary)
+FROM employees
+WHERE department_id IN (10, 20, 30, 40)
+GROUP BY department_id
+HAVING MAX(salary) > 10000;
+
+#方式 2
+SELECT department_id, MAX(salary)
+FROM employees
+GROUP BY department_id
+HAVING MAX(salary) > 10000
+   AND department_id IN (10, 20, 30, 40);
+
+/*
+  Where 和 having 的对比
+  #当过滤条件中有聚合函数时，则此过滤条件必须声明在having，当过滤条件没有聚合函数时，则此过滤条件声明在where中或having。
+  1.从适用范围来讲，having的适用范围更广。
+  2.如果过滤条件中没有聚合函数，这种情况下，where的执行效率高于having
+  3.互相不排斥
+*/
+
+#第八章
+# 1.查询公司员工工资的最大值，最小值，平均值，总和。
+SELECT MAX(salary), MIN(salary), AVG(salary), SUM(salary)
+FROM employees;
+# 2.查询各个job_id的员工工资的最大值，最小值，平均值，总和。
+# 3.选择具有各个job_id的员工人数
+SELECT job_id, count(*)
+FROM employees
+GROUP BY job_id;
+# 5.查询员工最高工资和最低工资的的差距，
+SELECT MAX(salary) - MIN(salary) "disparity"
+FROM employees;
+# 6.查询各个管理者手下员工的最低工资，其中最低工资不能低于6000，没有管理者的员工不计算在内
+SELECT MIN(salary), manager_id
+FROM employees
+WHERE manager_id IS NOT NULL
+GROUP BY manager_id
+HAVING MIN(salary) >= 6000;
+#7. 查询所有部门名字，location_id，员工数量和平均工资，并按平均工资降序。
+SELECT department_name, location_id, count(employee_id), AVG(salary)
+from departments d
+         LEFT JOIN employees e on d.department_id = e.department_id
+group by department_name, location_id
+HAVING AVG(salary) IS NOT NULL
+ORDER BY AVG(salary) DESC;
+# 查询每个工种，每个部门的部门名，工种名和最低工资。
+SELECT department_name, job_id, MIN(salary)
+FROM departments d
+         LEFT JOIN employees e on d.department_id = e.department_id
+GROUP BY department_name, job_id;
+# 子查询 : 子查询会在主查询之前一次执行完成。子查询的结果被主查询使用。
+select last_name, salary
+from employees
+where salary > (select salary
+                from employees
+                where last_name = 'Abel');
+
