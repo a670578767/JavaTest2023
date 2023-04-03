@@ -339,4 +339,23 @@ from employees
 where salary > (select salary
                 from employees
                 where last_name = 'Abel');
-
+# 查询工资大于149号员工工资的员工信息
+select *
+from employees
+where salary > (select salary
+                from employees
+                where employee_id = '149');
+# 返回job_id 与 141号员工相同，salary 比 143号员工多的员工姓名，job_id和工资
+select last_name, job_id, salary
+from employees
+where job_id = (select job_id
+                from employees
+                where employee_id = 141)
+  and salary > (select salary
+                from employees
+                where employee_id = 143);
+#返回公司工资最少的员工的last_name，job_id和salary
+select last_name, job_id, salary
+from employees
+where salary = (select min(salary)
+                from employees)
