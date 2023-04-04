@@ -354,8 +354,81 @@ where job_id = (select job_id
   and salary > (select salary
                 from employees
                 where employee_id = 143);
-#返回公司工资最少的员工的last_name，job_id和salary
+# 返回公司工资最少的员工的last_name，job_id和salary
 select last_name, job_id, salary
 from employees
 where salary = (select min(salary)
-                from employees)
+                from employees);
+
+# 题目:查询与141号或174号员工的manager_id和department_id相同的其他员工的employee_id,manager_id,department_id
+select employee_id, manager_id, department_id
+from employees
+where manager_id in (select manager_id from employees where employee_id = 141 or employee_id = 174)
+  and department_id in (select department_id from employees where employee_id = 141 or employee_id = 174);
+
+#题目:显示员工的employee_id，last_name和 location。其中，若员工employee_id与location_id为1800的department_id相同
+#则location_id为“Canada”，其余为“USA”。
+
+SELECT employee_id,
+       last_name,
+       (CASE department_id
+            WHEN (SELECT department_id FROM departments WHERE location_id = 1800) THEN 'Canada'
+            ELSE 'USA' END) "location"
+FROM employees;
+
+# 5 多行子查询
+# 5.1 多行子查询操作符: in any all some (同any)
+# 5.2 举例
+# IN:
+SELECT employee_id, last_name
+FROM employees
+WHERE salary IN (select min(salary) from employees GROUP BY department_id);
+# ANY / ALL :
+# 题目: 返回其他job_id和比job_id 为‘it_prog’部门任一工资低的员工和员工号，
+# 姓名，job_id 以及salary
+select employee_id, last_name, job_id, salary
+from employees
+where job_id <> 'IT_PROG'
+  AND salary < ANY (SELECT salary
+                    from employees
+                    where job_id = 'IT_PROG');
+
+# 题目：查询平均工资最低的部门id (MySQL中的聚合函数是不能嵌套使用的)
+# MySQL中的聚合函数是不能嵌套使用的
+
+# 方式1:
+SELECT department_id
+FROM employees
+GROUP BY department_id
+HAVING AVG(salary) = (select MIN(avg_sal)
+                      from (select AVG(salary) avg_sal
+                            FROM employees
+                            group by department_id) as eas);
+# 题目:查询员工中工资大于本部门平均工资的员工的last_name，salary和其他department_id
+select last_name, salary, department_id
+from employees e1
+where salary > (select avg(salary)
+                from employees e2
+                where department_id = e1.department_id);
+
+# EXISTS 与  NOT EXISTS 关键字
+# 关联子查询通常也会和EXISTS操作符一起来使用，用来检查在子查询中是否存在满足条件的行
+# 如果子查询中不存在满足的条件的行，条件返回false，继续在子查询中查找。
+# 如果子查询中满足存在条件的行，不在子查询中继续查找，条件返回true。
+# 题目:查询公司管理者的emloyee_id,last_name,job_id,department_id信息
+# 方式1:自连接
+SELECT distinct emgr.employee_id, emgr.last_name, emgr.job_id, emgr.department_id
+from employees emp
+         join employees emgr on emp.manager_id = emgr.employee_id;
+# 方式2:子查询
+SELECT employee_id, last_name, job_id, department_id
+FROM employees
+WHERE employee_id IN (SELECT DISTINCT manager_id
+                      FROM employees
+                      WHERE manager_id IS NOT NULL);
+# 方式3:使用EXISTS
+SELECT employee_id, last_name, job_id, department_id
+FROM employees e1
+WHERE EXISTS(
+    SELECT * FROM employees e2 where e1.employee_id = e2.manager_id
+)
