@@ -480,14 +480,39 @@ from employees
 where salary = (select MIN(salary) FROM employees);
 
 # 8.查询平均工资最低的部门
-select department_id
-from employees
-GROUP BY department_id
-having AVG(salary) = (select min(avg_sal)
-                      from (select AVG(salary) avg_sal # 字段别名
-                            FROM employees
-                            GROUP BY department_id) t_dept_avg_sal # 表别名
-)
+# 方式:1
+select *
+from departments
+where department_id = (select department_id
+                       from employees
+                       GROUP BY department_id
+                       having AVG(salary) = (select min(avg_sal)
+                                             from (select AVG(salary) avg_sal # 字段别名
+                                                   FROM employees
+                                                   GROUP BY department_id) t_dept_avg_sal # 表别名
+                       ));
+# 方式:2
+select *
+from departments
+where department_id = (select department_id
+                       from employees
+                       GROUP BY department_id
+                       having AVG(salary) <= ALL (select AVG(salary)
+                                                  FROM employees
+                                                  GROUP BY department_id));
+# 方式3 : LIMIT 主要用于提取前几条或者中间某几行数据
+select *
+from departments
+where department_id = (select department_id
+                       from employees
+                       GROUP BY department_id
+                       having AVG(salary) = (select AVG(salary) avg_salary
+                                             FROM employees
+                                             GROUP BY department_id
+                                             order by avg_salary
+                                             limit 1));
+
+
 
 
 
