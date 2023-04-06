@@ -610,12 +610,12 @@ where e.department_id = t_dept_max_sal.department_id;
 # 1. 创建和管理数据库
 create database helloMysql1; #默认使用字符集utf8mb4;
 show create database helloMysql1;
-create database helloMysql2 character set 'utf-8';
+create database helloMysql2 character set 'GBK';
 show create database helloMysql2;
 #如果要创建的数据库已经存在，则创建不成功，但不会报错。
 create database if not exists helloMysql3;
 
-# 2.管理数据库
+# 1.2 管理数据库
 # 查看当前连接中的数据库
 show databases;
 # 切换数据库
@@ -624,3 +624,12 @@ use atguigudb;
 show TABLES;
 # 查看当前使用的数据库
 select database();
+# 查看指定数据库下
+show tables from mysql;
+# 1.3 修改数据库
+ALTER database helloMysql2 character set 'GBK';
+# 1.4 删除数据库
+# 方式1:
+DROP database hellomysql1;
+# 方式2:如果存在删除，不存在默默结束，不报错
+DROP database IF EXISTS helloMysql2;
