@@ -371,9 +371,8 @@ where manager_id in (select manager_id from employees where employee_id = 141 or
 
 SELECT employee_id,
        last_name,
-       (CASE department_id
-            WHEN (SELECT department_id FROM departments WHERE location_id = 1800) THEN 'Canada'
-            ELSE 'USA' END) "location"
+       (IF(department_id = (SELECT department_id FROM departments WHERE location_id = 1800), 'Canada',
+           'USA')) "location"
 FROM employees;
 
 # 5 多行子查询
@@ -511,9 +510,117 @@ where department_id = (select department_id
                                              GROUP BY department_id
                                              order by avg_salary
                                              limit 1));
+# 方式4:
+select dep.*
+from departments dep,
+     (select department_id, avg(salary) avg_salary
+      from employees
+      GROUP BY department_id
+      order by avg_salary
+      limit 0,1) dep_avg
+where dep.department_id = dep_avg.department_id;
 
+# 一个SQL写好了，可以少些很多代码。
+# 10. 查询平均工资最高的job信息
+# 平均工资，最高
+select *
+from employees
+where job_id = (select job_id
+                from employees
+                group by job_id
+                having AVG(salary) = (select max(avg_salary)
+                                      from (select AVG(salary) avg_salary
+                                            from employees
+                                            GROUP BY job_id) t_avg_salasry));
+# 方式2 ：
+select *
+from jobs
+where job_id = (select job_id
+                from employees
+                group by job_id
+                having AVG(salary) >= ALL (
+                    (select AVG(salary)
+                     from employees
+                     GROUP BY job_id)));
 
+# 11.查询平均工资 高于 公司平均水平工资的 部门有哪些
 
+select department_id
+from employees
+WHERE department_id IS NOT NULL
+GROUP BY department_id
+having AVG(salary) >= (select AVG(salary)
+                       from employees);
+# 13.各个部门中，最高工资中 最低的那个部门的 最低工资是多少？
+select min(max_salary)
+from (select MAX(salary) max_salary
+      from employees
+      where department_id is not null
+      group by department_id) t_max_salary;
+# 哪个部门
+# 方式1:
+select MIN(salary)
+FROM employees
+WHERE department_id = (select department_id
+                       from employees
+                       GROUP BY department_id
+                       having max(salary) = (select min(max_salary)
+                                             from (select MAX(salary) max_salary
+                                                   from employees
+                                                   where department_id is not null
+                                                   group by department_id) t_max_salary));
 
+# 方式2:
+select MIN(salary)
+FROM employees
+WHERE department_id = (select department_id
+                       from employees
+                       GROUP BY department_id
+                       having max(salary) <= all (select MAX(salary)
+                                                  from employees
+                                                  where department_id is not null
+                                                  group by department_id));
 
+# 方式3:
+select MIN(salary)
+FROM employees
+WHERE department_id = (select department_id
+                       from employees
+                       GROUP BY department_id
+                       having max(salary) = (select MAX(salary) max_sal
+                                             from employees
+                                             where department_id is not null
+                                             group by department_id
+                                             order by max_sal
+                                             limit 0, 1));
+# 方式4:
+select MIN(salary)
+from employees e,
+     (select department_id, MAX(salary) max_sal
+      from employees
+      where department_id is not null
+      group by department_id
+      order by max_sal
+      limit 0, 1) t_dept_max_sal
+where e.department_id = t_dept_max_sal.department_id;
 
+/*
+   第十章 DDL 创建和管理表
+*/
+# 1. 创建和管理数据库
+create database helloMysql1; #默认使用字符集utf8mb4;
+show create database helloMysql1;
+create database helloMysql2 character set 'utf-8';
+show create database helloMysql2;
+#如果要创建的数据库已经存在，则创建不成功，但不会报错。
+create database if not exists helloMysql3;
+
+# 2.管理数据库
+# 查看当前连接中的数据库
+show databases;
+# 切换数据库
+use atguigudb;
+# 查看数据中都有哪些表
+show TABLES;
+# 查看当前使用的数据库
+select database();
