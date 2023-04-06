@@ -429,6 +429,66 @@ WHERE employee_id IN (SELECT DISTINCT manager_id
 # 方式3:使用EXISTS
 SELECT employee_id, last_name, job_id, department_id
 FROM employees e1
-WHERE EXISTS(
-    SELECT * FROM employees e2 where e1.employee_id = e2.manager_id
+WHERE EXISTS(SELECT *
+             FROM employees e2
+             where e1.employee_id = e2.manager_id);
+
+# 9 练习
+# 1.查询和Zlotkey相同部门的员工姓名和工资
+SELECT last_name, salary
+from employees
+where department_id in (select department_id
+                        from employees
+                        where last_name = 'Zlotkey');
+
+# 2.查询工资比公司平均工资高的员工的员工号，姓名和工资。
+SELECT employee_id, last_name, salary
+FROM employees
+WHERE salary > (SELECT AVG(salary) FROM employees);
+
+# 3.选择工资大于所有JOB_ID = "SA_MAN"的员工的工资的员工的last_name,job_id,salary
+SELECT last_name, job_id, salary
+FROM employees
+WHERE salary > ALL (SELECT salary
+                    FROM employees
+                    WHERE job_id = 'SA_MAN');
+
+# 4.查询和姓名中包含字母u的员工在相同部门的员工的员工号和姓名
+select employee_id, last_name
+from employees
+where department_id in (select department_id
+                        from employees
+                        where last_name like '%u%');
+
+# 5.查询在部门的location_id为1700的部门工作的员工的员工号
+select employee_id
+from employees
+where department_id in (select department_id
+                        from departments
+                        where location_id = 1700);
+
+# 6.查询管理者是king的员工姓名和工资
+select last_name, salary
+from employees
+where manager_id in (select employee_id
+                     from employees
+                     where last_name = 'King');
+
+# 7.查询工资最低的员工信息:last_name， salary
+select last_name, salary
+from employees
+where salary = (select MIN(salary) FROM employees);
+
+# 8.查询平均工资最低的部门
+select department_id
+from employees
+GROUP BY department_id
+having AVG(salary) = (select min(avg_sal)
+                      from (select AVG(salary) avg_sal # 字段别名
+                            FROM employees
+                            GROUP BY department_id) t_dept_avg_sal # 表别名
 )
+
+
+
+
